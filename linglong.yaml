@@ -1,0 +1,53 @@
+version: "1"
+
+package:
+  id: com.zhaoxin.driver.cx4
+  name: cx4 graphics driver
+  version: 25.2.0.3
+  kind: extension
+  description: |
+    Zhaoxin cx4 graphics driver
+  env:
+    __EGL_VENDOR_LIBRARY_DIRS: $PREFIX/glvnd/egl_vendor.d:$ORIGIN
+    LIBGL_DRIVERS_PATH: $ORIGIN:$PREFIX/lib/dri
+    GBM_BACKENDS_PATH: $ORIGIN:$PREFIX/lib/gbm
+    VDPAU_DRIVER_PATH: $PREFIX/lib/vdpau
+    VK_ADD_DRIVER_FILES: $PREFIX/vulkan/icd.d/cx4_icd.x86_64.json
+
+permissions:
+  innerBinds:
+    - source: /opt/extensions/com.zhaoxin.driver.cx4/glvnd/egl_vendor.d/10_cx4.json
+      destination: /usr/share/glvnd/egl_vendor.d/10_cx4.json
+
+base: org.deepin.base/25.2.0
+
+sources:
+  - kind: file
+    url: https://pools.uniontech.com/desktop-professional-V25/pool/commercial/c/cx4-linux-graphics-driver-dri/cx4-linux-graphics-driver-dri_26.00.46_amd64.deb
+    digest: 4dd471f140e74f82dd89498d79921d93a88561b161876851cf49c505df38564e
+
+build: |
+  echo 'hello' #some operation to build this project
+
+  rm -rf extracted
+  dpkg-deb -R /project/linglong/sources/cx4-linux-graphics-driver-dri_26.00.46_amd64.deb extracted
+
+  mkdir -p $PREFIX/lib
+  cp -r extracted/usr/lib/${TRIPLET}/* $PREFIX/lib
+
+  mkdir -p $PREFIX/vulkan
+  cp -r extracted/usr/share/vulkan/* $PREFIX/vulkan
+  sed -i "s/\/usr\/lib\/x86_64-linux-gnu\/libvulkan_cx4.so/libvulkan_cx4.so/" $PREFIX/vulkan/icd.d/cx4_icd.x86_64.json
+
+  mkdir -p $PREFIX/glvnd
+  cp -r extracted/usr/share/glvnd/* $PREFIX/glvnd
+  sed -i "s/\"library_path\" : \"\"/\"library_path\" : \"libEGL_cx4.so.0\"/g" $PREFIX/glvnd/egl_vendor.d/10_cx4.json
+
+  mkdir -p $PREFIX/etc
+  cp ld.so.conf $PREFIX/etc/
+
+  ldconfig
+
+  rm -rf extracted
+
+  echo 'build done'
