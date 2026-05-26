@@ -3,13 +3,14 @@ version: "1"
 package:
   id: com.zhaoxin.driver.cx4
   name: cx4 graphics driver
-  version: 25.2.0.3
+  version: 25.2.0.4
   kind: extension
   description: |
     Zhaoxin cx4 graphics driver
   env:
     __EGL_VENDOR_LIBRARY_DIRS: $PREFIX/glvnd/egl_vendor.d:$ORIGIN
     LIBGL_DRIVERS_PATH: $ORIGIN:$PREFIX/lib/dri
+    LIBVA_DRIVERS_PATH: $ORIGIN:$PREFIX/lib/dri
     GBM_BACKENDS_PATH: $ORIGIN:$PREFIX/lib/gbm
     VDPAU_DRIVER_PATH: $PREFIX/lib/vdpau
     VK_ADD_DRIVER_FILES: $PREFIX/vulkan/icd.d/cx4_icd.x86_64.json
